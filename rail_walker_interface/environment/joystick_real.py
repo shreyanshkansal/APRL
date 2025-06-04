@@ -229,7 +229,6 @@ class JoystickEnvImpl(gym.Env[dict[str,Any],np.ndarray], WalkerEnvironment, Joys
             infos["TimeLimit.truncated"] = True
         
         done = self.joystick_policy.should_terminate() or truncated
-        print('blah blah blah blah')
         return obs, reward, done, infos
 
     def reset(self, seed : int | None = None, options: dict[str, Any] | None = None, **kwargs) -> tuple[dict[str,Any], dict[str,Any]]:
