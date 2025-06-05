@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 import os
-
+import cv2
 import gym
 import numpy as np
 import tqdm
@@ -396,6 +396,9 @@ def main(_):
             
             # Step the environment
             next_observation, reward, done, info = env.step(action)
+            frame = env.render(mode="rgb_array")  # replaces env.render()
+            cv2.imshow("Simulation", frame)
+            cv2.waitKey(1)
             truncated = "TimeLimit.truncated" in info and info['TimeLimit.truncated']
             if (not done) or truncated:
                 mask = 1.0
