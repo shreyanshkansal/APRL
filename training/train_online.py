@@ -23,12 +23,11 @@ import rail_walker_gym
 import rail_walker_interface
 import matplotlib.pyplot as plt
 
-from checkpoint_util import initialize_project_log, load_latest_checkpoint, save_checkpoint, load_latest_replay_buffer, load_latest_additional_replay_buffer, load_replay_buffer_file, save_replay_buffer, save_rollout
+from checkpoint_util import initialize_project_log, load_latest_checkpoint, save_checkpoint, load_latest_replay_buffer, load_latest_additional_replay_buffer, load_replay_buffer_file, save_replay_buffer, save_rollout, make_checkpoint_manager
 from eval_util import evaluate, evaluate_route_following, log_visitation, update_with_delay_with_mixed_buffers
 from task_config_util import apply_task_configs
 from action_curriculum_util import get_action_curriculum_planner_linear, get_action_curriculum_planner_quadratic
 
-#dummy comment
 FLAGS = flags.FLAGS
 
 # ==================== Training Flags ====================
@@ -238,14 +237,16 @@ def main(_):
     done = False
     # ==================== Setup Checkpointing ====================
     project_dir = os.path.join(FLAGS.save_dir, exp_name)
+    chkpt_dir = os.path.join(project_dir, 'checkpoints')
     initialize_project_log(project_dir)
+    checkpoint_manager = make_checkpoint_manager(chkpt_dir)
 
     # ==================== Setup Learning Agent and Replay Buffer ====================
     agent_kwargs = dict(FLAGS.config)
     model_cls = agent_kwargs.pop('model_cls')
 
     agent = initialize_agent(FLAGS.seed, model_cls, env.observation_space, env.action_space, **agent_kwargs)
-    agent_loaded_checkpoint_step, agent = load_latest_checkpoint(project_dir, agent, 0)
+    agent_loaded_checkpoint_step, agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
 
     if agent_loaded_checkpoint_step > 0:
         print(f"===================== Loaded checkpoint at step {agent_loaded_checkpoint_step} =====================")
@@ -500,7 +501,7 @@ def main(_):
 
             
             if i % FLAGS.save_interval == 0 and i > agent_loaded_checkpoint_step:
-                save_checkpoint(os.path.join(project_dir), i, agent)
+                save_checkpoint(checkpoint_manager, i, agent)
 
                 if i % (FLAGS.log_interval * 10) == 0 and i > agent_loaded_checkpoint_step and FLAGS.save_buffer:
                     save_replay_buffer(project_dir, i, replay_buffer, not FLAGS.save_old_buffers)
@@ -623,7 +624,7 @@ def main(_):
         print("======================== Cleaning up ========================")
         # ==================== Save Final Checkpoint ====================
         if i > agent_loaded_checkpoint_step + FLAGS.start_training:
-            save_checkpoint(project_dir, i, agent)
+            save_checkpoint(checkpoint_manager, i, agent)
             if FLAGS.save_buffer:
                 save_replay_buffer(project_dir, i, replay_buffer, not FLAGS.save_old_buffers)
         if FLAGS.save_training_rollouts and len(env.collected_rollouts) > 0:

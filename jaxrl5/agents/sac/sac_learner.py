@@ -27,13 +27,13 @@ from flax.core.frozen_dict import unfreeze
 
 def convert_to_numpy_array(param):
     if isinstance(param, list):
-        return jax.tree_map(convert_to_numpy_array, param)
+        return jax.tree_util.tree_map(convert_to_numpy_array, param)
     else:
         return jnp.array(param)
 
 def tree_multimap(func, tree1, tree2):
     """Apply a function element-wise to two trees."""
-    return jax.tree_map(lambda x, y: func(x, y), tree1, tree2)
+    return jax.tree_util.tree_map(lambda x, y: func(x, y), tree1, tree2)
 
 def compute_critic_param_change_norm(before_params, after_params):
     param_squares = tree_multimap(lambda p1, p2: jnp.sum((p2 - p1) ** 2), before_params, after_params)
@@ -41,7 +41,7 @@ def compute_critic_param_change_norm(before_params, after_params):
     return param_change_norm
 
 def compute_gradient_norm(grads):
-    grad_squares = jax.tree_map(lambda g: jnp.sum(g ** 2), grads)
+    grad_squares = jax.tree_util.tree_map(lambda g: jnp.sum(g ** 2), grads)
     grad_norm = jnp.sqrt(jnp.sum(jnp.array(jax.tree_util.tree_leaves(grad_squares))))
     return grad_norm
 

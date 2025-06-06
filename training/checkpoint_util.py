@@ -2,11 +2,19 @@ import os
 import typing
 from jaxrl5.agents.agent import Agent as JaxRLAgent
 from jaxrl5.data import ReplayBuffer
-from flax.training import checkpoints
+from flax.training import orbax_utils
 from natsort import natsorted
 import pickle
 import shutil
 from rail_walker_gym.envs.wrappers.rollout_collect import Rollout
+import orbax.checkpoint
+
+def make_checkpoint_manager(chkpt_dir):
+    options = orbax.checkpoint.CheckpointManagerOptions(max_to_keep=10, create=True)
+    checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+    checkpoint_manager = orbax.checkpoint.CheckpointManager(
+    chkpt_dir, checkpointer, options)
+    return checkpoint_manager
 
 def initialize_project_log(project_dir) -> None:
     os.makedirs(project_dir, exist_ok=True)
@@ -21,43 +29,48 @@ def initialize_project_log(project_dir) -> None:
     os.makedirs(rollout_dir, exist_ok=True)
     os.makedirs(eval_rollout_dir, exist_ok=True)
 
-def list_checkpoint_steps(project_dir) -> typing.List[int]:
-    chkpt_dir = os.path.join(project_dir,'checkpoints')
-    chkpts = natsorted(os.listdir(chkpt_dir))
-    return [int(chkpt.split('_')[-1]) for chkpt in chkpts]
+def list_checkpoint_steps(checkpoint_manager) -> typing.List[int]:
+    return checkpoint_manager.all_steps()
 
 def list_replay_buffer_steps(project_dir) -> typing.List[int]:
     buffer_dir = os.path.join(project_dir, "buffers")
     buffers = natsorted(os.listdir(buffer_dir))
     return [int(buffer.split('_')[-1].split('.')[0]) for buffer in buffers]
 
-def load_checkpoint_at_step(project_dir, step : int, agent : JaxRLAgent, if_failed_return_step : int = 0) -> typing.Tuple[int, JaxRLAgent]:
-    chkpt_dir = os.path.join(project_dir,'checkpoints')
-    chkpts = os.listdir(chkpt_dir)
-    for chkpt in chkpts:
-        chkpt_int = int(chkpt.split('_')[-1])
-        if chkpt_int == step:
-            agent = checkpoints.restore_checkpoint(os.path.join(chkpt_dir, chkpt), agent)
-            return chkpt_int, agent
-    
-    return if_failed_return_step, agent
+def load_checkpoint_at_step(checkpoint_manager, step : int, agent : JaxRLAgent, if_failed_return_step : int = 0) -> typing.Tuple[int, JaxRLAgent]:
+    available_steps = checkpoint_manager.all_steps()
+    if step not in available_steps:
+        return if_failed_return_step, agent
+
+    restore_args = orbax_utils.restore_args_from_target(agent)
+    try:
+        agent = checkpoint_manager.restore(
+            step, items=agent, restore_kwargs={'restore_args': restore_args}
+        )
+        return step, agent
+    except Exception:
+        return if_failed_return_step, agent
 
 def load_checkpoint_file(
     filename : str,
     agent : JaxRLAgent
 ):
-    agent = checkpoints.restore_checkpoint(filename, agent)
+    checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+    restore_args = orbax_utils.restore_args_from_target(agent)
+    agent = checkpointer.restore(filename, item=agent, restore_kwargs={'restore_args': restore_args})
     return agent
 
-def load_latest_checkpoint(project_dir, agent : JaxRLAgent, if_failled_return_step: int = 0) -> typing.Tuple[int, JaxRLAgent]:
-    chkpt_dir = os.path.join(project_dir,'checkpoints')
-    chkpts = natsorted(os.listdir(chkpt_dir))
-    if len(chkpts) == 0:
-        return if_failled_return_step, agent
-    else:
-        chkpt_int = int(chkpts[-1].split('_')[-1])
-        agent = checkpoints.restore_checkpoint(os.path.join(chkpt_dir, chkpts[-1]), agent)
-        return chkpt_int, agent
+def load_latest_checkpoint(checkpoint_manager, agent : JaxRLAgent, if_failed_return_step: int = 0) -> typing.Tuple[int, JaxRLAgent]:
+    latest_step = checkpoint_manager.latest_step()
+    if latest_step is None:
+        return if_failed_return_step, agent
+    restore_args = orbax_utils.restore_args_from_target(agent)
+    agent = checkpoint_manager.restore(
+        latest_step,
+        items=agent,
+        restore_kwargs={'restore_args': restore_args}
+    )
+    return latest_step, agent
 
 def load_latest_replay_buffer(project_dir) -> typing.Optional[typing.Tuple[int, ReplayBuffer]]:
     buffer_dir = os.path.join(project_dir, "buffers")
@@ -96,17 +109,11 @@ def load_replay_buffer_file(filename : str) -> ReplayBuffer:
         replay_buffer = pickle.load(f)
     return replay_buffer
 
-def save_checkpoint(project_dir, step : int, agent : JaxRLAgent) -> None:
-    chkpt_dir = os.path.join(project_dir,'checkpoints')
+def save_checkpoint(checkpoint_manager, step : int, agent : JaxRLAgent) -> None:
     try:
-        checkpoints.save_checkpoint(
-            chkpt_dir,
-            agent,
-            step=step,
-            keep=10,
-            overwrite=True
-        )
-    except:
+        save_args = orbax_utils.save_args_from_target(agent)
+        checkpoint_manager.save(step, agent, save_kwargs={'save_args': save_args})
+    except Exception:
         pass
 
 def save_replay_buffer(project_dir, step: int, replay_buffer: ReplayBuffer, delete_old_buffers : bool = True) -> None:
