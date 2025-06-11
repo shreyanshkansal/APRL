@@ -65,7 +65,7 @@
       <inertial pos="0.021112 0 -0.005366" quat="-0.000543471 0.713435 -0.00173769 0.700719"
         mass="6.921"
         diaginertia="0.107027 0.0980771 0.0244531" />
-      <freejoint />
+<!--     <freejoint/>  -->
       <geom mesh="base_0" material="black" class="visual" />
       <geom mesh="base_1" material="black" class="visual" />
       <geom mesh="base_2" material="black" class="visual" />
@@ -105,6 +105,7 @@
               type="cylinder" class="collision" />
             <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
             <geom name="FL" class="foot" />
+            <site name="FL_foot_site" pos="0 0 -0.213" size="0.02" />
             <body name="FL_foot" pos="0 0 -0.213" />
           </body>
         </body>
@@ -140,6 +141,7 @@
               type="cylinder" class="collision" />
             <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
             <geom name="FR" class="foot" />
+            <site name="FR_foot_site" pos="0 0 -0.213" size="0.02" />
             <body name="FR_foot" pos="0 0 -0.213" />
           </body>
         </body>
@@ -175,6 +177,7 @@
               type="cylinder" class="collision" />
             <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
             <geom name="RL" class="foot" />
+            <site name="RL_foot_site" pos="0 0 -0.213" size="0.02" />
             <body name="RL_foot" pos="0 0 -0.213" />
           </body>
         </body>
@@ -212,6 +215,7 @@
               type="cylinder" class="collision" />
             <geom pos="0 0 -0.213" mesh="foot" class="visual" material="black" />
             <geom name="RR" class="foot" />
+            <site name="RR_foot_site" pos="0 0 -0.213" size="0.02" />
             <body name="RR_foot" pos="0 0 -0.213" />
           </body>
         </body>
@@ -274,12 +278,20 @@
     <jointactuatorfrc name="RL_thigh_torque" joint="RL_thigh_joint" noise="0.01" />
     <jointactuatorfrc name="RL_calf_torque" joint="RL_calf_joint" noise="0.01" />
 -->
+    <subtreelinvel name="base_linvel" body="base_link" />
+    <subtreeangmom name="base_angmom" body="base_link" />
+    <velocimeter name="velocimeter" site="imu" />
+
     <framequat name="imu_quat" objtype="site" objname="imu" />
     <gyro name="imu_gyro" site="imu" />
     <accelerometer name="imu_acc" site="imu" />
-    
     <framepos name="frame_pos" objtype="site" objname="imu" />
     <framelinvel name="frame_vel" objtype="site" objname="imu" />
+
+    <touch name="FR_foot_touch" site="FR_foot_site" />
+    <touch name="FL_foot_touch" site="FL_foot_site" />
+    <touch name="RR_foot_touch" site="RR_foot_site" />
+    <touch name="RL_foot_touch" site="RL_foot_site" />
   </sensor>
 
   <keyframe>
