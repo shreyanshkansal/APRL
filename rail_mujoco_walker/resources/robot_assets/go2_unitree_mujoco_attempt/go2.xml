@@ -260,7 +260,7 @@
     <jointvel name="RL_hip_vel" joint="RL_hip_joint" />
     <jointvel name="RL_thigh_vel" joint="RL_thigh_joint" />
     <jointvel name="RL_calf_vel" joint="RL_calf_joint" />
-
+    <!--
     <jointactuatorfrc name="FR_hip_torque" joint="FR_hip_joint" noise="0.01" />
     <jointactuatorfrc name="FR_thigh_torque" joint="FR_thigh_joint" noise="0.01" />
     <jointactuatorfrc name="FR_calf_torque" joint="FR_calf_joint" noise="0.01" />
@@ -273,7 +273,7 @@
     <jointactuatorfrc name="RL_hip_torque" joint="RL_hip_joint" noise="0.01" />
     <jointactuatorfrc name="RL_thigh_torque" joint="RL_thigh_joint" noise="0.01" />
     <jointactuatorfrc name="RL_calf_torque" joint="RL_calf_joint" noise="0.01" />
-
+-->
     <framequat name="imu_quat" objtype="site" objname="imu" />
     <gyro name="imu_gyro" site="imu" />
     <accelerometer name="imu_acc" site="imu" />
