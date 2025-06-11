@@ -4,14 +4,7 @@ import numpy as np
 from .sim_robot import RailSimWalkerDMControl, SIM_ASSET_DIR
 from functools import cached_property
 
-_Go2_XML_PATH = os.path.join(SIM_ASSET_DIR, 'robot_assets', 'go2', 'go2.xml')
-
-"""
-Go1 simulation robot using DM_Control suite
-Joint limits are based on https://github.com/unitreerobotics/unitree_legged_sdk/blob/go1/include/unitree_legged_sdk/go1_const.h
-They are also cross-checked with XML definition file for go1 (Credit to Kevin for exporting the XML file from Unitree_ROS)
-The XML file in unitree_mujoco is actually wrong, it is a copy of a1.xml
-"""
+_Go2_XML_PATH = os.path.join(SIM_ASSET_DIR, 'robot_assets', 'unitree_go2', 'go2.xml')
 class Go2SimWalker(RailSimWalkerDMControl):
     # _INIT_QPOS = np.asarray([0.0, 0.9, -1.8] * 4)
     # _QPOS_OFFSET = np.asarray([0.2, 0.4, 0.4] * 4)
