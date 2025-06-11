@@ -4,7 +4,7 @@ import numpy as np
 from .sim_robot import RailSimWalkerDMControl, SIM_ASSET_DIR
 from functools import cached_property
 
-_Go2_XML_PATH = os.path.join(SIM_ASSET_DIR, 'robot_assets', 'go2', 'xml', 'go2.xml')
+_Go2_XML_PATH = os.path.join(SIM_ASSET_DIR, 'robot_assets', 'go2', 'go2.xml')
 
 """
 Go1 simulation robot using DM_Control suite
