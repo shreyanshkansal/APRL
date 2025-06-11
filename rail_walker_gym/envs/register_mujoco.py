@@ -1,7 +1,7 @@
 import gym
 from dm_control.locomotion import arenas
 from .register_helper import iter_formatted_register_env
-from rail_mujoco_walker import RailSimWalkerDMControl, Go1SimWalker, A1SimWalker, JoystickPolicyDMControlTask, HeightFieldArena, HEIGHTFIELD_ARENA_GOALS, CrouchingHeightfieldArena
+from rail_mujoco_walker import RailSimWalkerDMControl, Go1SimWalker, Go2SimWalker,A1SimWalker, JoystickPolicyDMControlTask, HeightFieldArena, HEIGHTFIELD_ARENA_GOALS, CrouchingHeightfieldArena
 from rail_walker_interface import JoystickPolicy, BaseWalker, WalkerVelocitySmoother
 from typing import Any, Optional
 from .wrappers import *
@@ -23,6 +23,9 @@ def make_sim_env(
 ) -> gym.Env:
     print("Making sim env")
     if isinstance(robot.unwrapped(), Go1SimWalker):
+        robot.control_timestep = 0.05
+        robot.control_subtimestep = 0.005
+    if isinstance(robot.unwrapped(), Go2SimWalker):
         robot.control_timestep = 0.05
         robot.control_subtimestep = 0.005
     elif isinstance(robot, A1SimWalker):
@@ -371,6 +374,15 @@ iter_formatted_register_env(
             ("Go1", None, lambda kwargs: {
                 **kwargs,
                 "robot": Go1SimWalker(
+                    Kp = CONFIG_KP,
+                    Kd = CONFIG_KD,
+                    action_interpolation = CONFIG_ACTION_INTERPOLATION,
+                    limit_action_range=CONFIG_ACTION_RANGE,
+                )
+            }),
+            ("Go2", None, lambda kwargs: {
+                **kwargs,
+                "robot": Go2SimWalker(
                     Kp = CONFIG_KP,
                     Kd = CONFIG_KD,
                     action_interpolation = CONFIG_ACTION_INTERPOLATION,
