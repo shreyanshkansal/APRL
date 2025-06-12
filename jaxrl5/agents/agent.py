@@ -13,6 +13,8 @@ from jaxrl5.types import PRNGKey
 def _sample_actions(rng, apply_fn, params, observations: np.ndarray, **kwargs) -> np.ndarray:
     key, rng = jax.random.split(rng)
     dist = apply_fn({"params": params}, observations, **kwargs)
+    #jax.debug.print(type(dist))
+    #jax.debug.print(dist)
     return dist.sample(seed=key), rng
 
 

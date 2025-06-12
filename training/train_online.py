@@ -391,12 +391,18 @@ def main(_):
                     action = action * multiplier
                         
             else:
+                print("Step:", i)
                 action, agent = agent.sample_actions(observation)
                 
+            action = np.asarray(action, dtype=np.float32).reshape(env.action_space.shape)
+            action = np.clip(action, env.action_space.low, env.action_space.high)
+            assert env.action_space.contains(action), f"Invalid action: {action}"
+
             actions.append(action)
             
             # Step the environment
             next_observation, reward, done, info = env.step(action)
+            print("Step:", i)
             frame = env.render(mode="rgb_array")  # replaces env.render()
             cv2.imshow("Simulation", frame)
             cv2.waitKey(1)
