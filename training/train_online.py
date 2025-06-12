@@ -382,7 +382,7 @@ def main(_):
             if i < FLAGS.start_training:
                 action = env.action_space.sample()
                 planned_action_range = action_curriculum_planner(i)
-                # planned_action_range = curriculum_planners[which_agent](i)
+                #planned_action_range = curriculum_planners[which_agent](i)
                 if planned_action_range is not None:
                     multiplier = planned_action_range[1]
                     if not(FLAGS.action_curriculum_exploration_eps <= 0.0 or np.random.rand() >= FLAGS.action_curriculum_exploration_eps):
@@ -393,13 +393,16 @@ def main(_):
             else:
                 print("Step:", i)
                 action, agent = agent.sample_actions(observation)
-                
-            action = np.asarray(action, dtype=np.float32).reshape(env.action_space.shape)
-            action = np.clip(action, env.action_space.low, env.action_space.high)
-            assert env.action_space.contains(action), f"Invalid action: {action}"
 
             actions.append(action)
-            
+            print("Action about to step:", action)
+            print("Action dtype:", action.dtype)
+            print("Action shape:", action.shape)
+            print("Action min:", np.min(action), "max:", np.max(action))
+            print("Action type:", type(action))
+            print("Action space:", env.action_space)
+
+            # action = np.clip(action, -1.0, 1.0)
             # Step the environment
             next_observation, reward, done, info = env.step(action)
             print("Step:", i)

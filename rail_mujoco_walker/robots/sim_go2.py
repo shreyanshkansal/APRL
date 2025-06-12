@@ -24,22 +24,25 @@ class Go2SimWalker(RailSimWalkerDMControl):
         RailSimWalkerDMControl.control_timestep = 0.05
         RailSimWalkerDMControl.control_subtimestep = 0.002
 
+    #the following values are gotten from the xml file
     @cached_property
     def joint_qpos_init(self) -> np.ndarray:
-        # shift_delta = np.array([-0.1, -0.1, 0.1])
-        # real_shift = shift_delta.repeat(4).reshape((3,4)).T.flatten()
-        # real_shift[3::6] = -real_shift[3::6]
-        real_shift = np.array([
-            -0.1, -0.2, 0.0,
-            0.1, -0.2, 0.0,
-            -0.1, 0.0, 0.0,
-            0.1, 0.0, 0.0
+        
+        return np.array([
+            0.0, 0.9, -1.8,   # FL
+            0.0, 0.9, -1.8,   # FR
+            0.0, 0.9, -1.8,   # RL
+            0.0, 0.9, -1.8    # RR
         ])
-        return np.array([0.0 / 180 * np.pi, 45.0/180*np.pi, -90.0 / 180 * np.pi] * 4) + real_shift
 
     @cached_property
     def joint_qpos_sitting(self) -> np.ndarray:
-        return np.array([0.0 / 180 * np.pi, 70.0/180*np.pi, -150.0 / 180 * np.pi] * 4)
+        return np.array([
+            0.0, 1.3, -2.3,   # FL
+            0.0, 1.3, -2.3,   # FR
+            0.0, 1.3, -2.3,   # RL
+            0.0, 1.3, -2.3    # RR
+        ])
     
     @cached_property
     def joint_qpos_offset(self) -> np.ndarray:
@@ -47,9 +50,19 @@ class Go2SimWalker(RailSimWalkerDMControl):
 
     @cached_property
     def joint_qpos_mins(self) -> np.ndarray:
-        return np.asarray([-1.047, -0.663, -2.721] * 4)
+        return np.asarray([
+            -1.0472, -1.5708, -2.7227,  # FL (front left)
+            -1.0472, -1.5708, -2.7227,  # FR (front right)
+            -1.0472, -0.5236, -2.7227,  # RL (rear left)
+            -1.0472, -0.5236, -2.7227,  # RR (rear right)
+        ])
 
     @cached_property
     def joint_qpos_maxs(self) -> np.ndarray:
-        return np.asarray([1.047, 2.966, -0.837] * 4)
+        return np.asarray([
+            1.0472, 3.4907, -0.83776,   # FL (front left)
+            1.0472, 3.4907, -0.83776,   # FR (front right)
+            1.0472, 4.5379, -0.83776,   # RL (rear left)
+            1.0472, 4.5379, -0.83776,   # RR (rear right)
+        ])
 
