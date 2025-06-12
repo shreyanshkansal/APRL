@@ -395,18 +395,11 @@ def main(_):
                 action, agent = agent.sample_actions(observation)
 
             actions.append(action)
-            print("Action about to step:", action)
-            print("Action dtype:", action.dtype)
-            print("Action shape:", action.shape)
-            print("Action min:", np.min(action), "max:", np.max(action))
-            print("Action type:", type(action))
-            print("Action space:", env.action_space)
-
-            # action = np.clip(action, -1.0, 1.0)
+        
             # Step the environment
             next_observation, reward, done, info = env.step(action)
             print("Step:", i)
-            frame = env.render(mode="rgb_array")  # replaces env.render()
+            frame = env.render(mode="rgb_array") 
             cv2.imshow("Simulation", frame)
             cv2.waitKey(1)
             truncated = "TimeLimit.truncated" in info and info['TimeLimit.truncated']
