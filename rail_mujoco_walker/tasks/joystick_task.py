@@ -166,7 +166,10 @@ class JoystickPolicyDMControlTask(composer.Task):
         
         # Measure body weight in Newtons.
         #body_mass = physics.named.model.body_subtreemass['robot/trunk']     #go1
-        body_mass = physics.named.model.body_subtreemass['robot/base_link']  #go2
+        if "go2" in (str(self.robot)):
+            body_mass = physics.named.model.body_subtreemass['robot/base_link']  #go2
+        elif "go1" in (str(self.robot)) or "a1" in (str(self.robot)):
+            body_mass = physics.named.model.body_subtreemass['robot/trunk']  #go1
         self._body_weight = -physics.model.opt.gravity[2] * body_mass
 
         self._perturb_steps: int = 0
@@ -232,8 +235,10 @@ class JoystickPolicyDMControlTask(composer.Task):
             self._frc = magnitude * vector
             self._perturb_steps = 0
 
-        #physics.named.data.xfrc_applied["robot/trunk", :3] = self._frc   #go1
-        physics.named.data.xfrc_applied["robot/base_link", :3] = self._frc   #go2
+        if "go2" in (str(self.robot)):
+            physics.named.data.xfrc_applied["robot/base_link", :3] = self._frc  
+        elif "go1" in (str(self.robot)) or "a1" in (str(self.robot)):
+            physics.named.data.xfrc_applied["robot/trunk", :3] = self._frc
         self._perturb_steps += 1
         
     @cached_property
