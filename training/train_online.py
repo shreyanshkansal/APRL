@@ -391,7 +391,6 @@ def main(_):
                     action = action * multiplier
                         
             else:
-                print("Step:", i)
                 action, agent = agent.sample_actions(observation)
 
             actions.append(action)
