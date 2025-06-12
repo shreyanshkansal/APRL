@@ -223,10 +223,8 @@ class DMWalkerForRailSimWalker(base.Walker):
         if name:
             self._mjcf_root.model = name
         # Find MJCF elements that will be exposed as attributes.
-        #self._root_body = self._mjcf_root.find('body', 'trunk') #this is needed for go1
-        self._root_body = self._mjcf_root.find('body', 'base_link')   #this is needed for go2
-        print('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
-        print(self._root_body)
+        self._root_body = self._mjcf_root.find('body', 'trunk')      #go1
+        #self._root_body = self._mjcf_root.find('body', 'base_link')   #go2
         self._root_body.pos[-1] = 0.125
 
         self._foot_sites = [
