@@ -397,7 +397,6 @@ def main(_):
         
             # Step the environment
             next_observation, reward, done, info = env.step(action)
-            print("Step:", i)
             frame = env.render(mode="rgb_array") 
             cv2.imshow("Simulation", frame)
             cv2.waitKey(1)
