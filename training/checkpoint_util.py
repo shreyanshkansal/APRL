@@ -41,14 +41,29 @@ def load_checkpoint_at_step(checkpoint_manager, step : int, agent : JaxRLAgent, 
     available_steps = checkpoint_manager.all_steps()
     if step not in available_steps:
         return if_failed_return_step, agent
-
-    restore_args = orbax_utils.restore_args_from_target(agent)
     try:
-        agent = checkpoint_manager.restore(
-            step, items=agent, restore_kwargs={'restore_args': restore_args}
+        restored = checkpoint_manager.restore(
+            step,
+            args=ocp.args.Composite(
+                actor=ocp.args.StandardRestore(agent.actor),
+                critic=ocp.args.StandardRestore(agent.critic),
+                target_critic=ocp.args.StandardRestore(agent.target_critic),
+                temp=ocp.args.StandardRestore(agent.temp),
+                dynamics_model=ocp.args.StandardRestore(agent.dynamics_model),
+                rng=ocp.args.ArrayRestore(agent.rng),
+            )
         )
-        return step, agent
-    except Exception:
+        loaded_agent = agent.replace(
+            actor=restored.actor,
+            critic=restored.critic,
+            target_critic=restored.target_critic,
+            temp=restored.temp,
+            dynamics_model=restored.dynamics_model,
+            rng=restored.rng,
+        )
+        return step, loaded_agent
+    except Exception as e:
+        print(f"Checkpoint load failed with exception: {e}")
         return if_failed_return_step, agent
 
 def load_checkpoint_file(
@@ -64,15 +79,30 @@ def load_latest_checkpoint(checkpoint_manager, agent : JaxRLAgent, if_failed_ret
     latest_step = checkpoint_manager.latest_step()
     if latest_step is None:
         return if_failed_return_step, agent
-    #restore_args = orbax_utils.restore_args_from_target(agent)
-    restore_args = ocp.args.StandardRestore(agent)
-    #agent = checkpoint_manager.restore(
-    #    latest_step,
-    #    items=agent,
-        #restore_kwargs={'restore_args': restore_args}
-    #    restore_args
-    #)
-    return latest_step, agent
+    try:
+        restored = checkpoint_manager.restore(
+            latest_step,
+            args=ocp.args.Composite(
+                actor=ocp.args.StandardRestore(agent.actor),
+                critic=ocp.args.StandardRestore(agent.critic),
+                target_critic=ocp.args.StandardRestore(agent.target_critic),
+                temp=ocp.args.StandardRestore(agent.temp),
+                dynamics_model=ocp.args.StandardRestore(agent.dynamics_model),
+                rng=ocp.args.ArrayRestore(agent.rng),
+            )
+        )
+        loaded_agent = agent.replace(
+            actor=restored.actor,
+            critic=restored.critic,
+            target_critic=restored.target_critic,
+            temp=restored.temp,
+            dynamics_model=restored.dynamics_model,
+            rng=restored.rng,
+        )
+        return latest_step, loaded_agent
+    except Exception as e:
+        print(f"Checkpoint load failed with exception: {e}")
+        return if_failed_return_step, agent
 
 def load_latest_replay_buffer(project_dir) -> typing.Optional[typing.Tuple[int, ReplayBuffer]]:
     buffer_dir = os.path.join(project_dir, "buffers")
