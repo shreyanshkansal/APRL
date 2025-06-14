@@ -7,13 +7,13 @@ from natsort import natsorted
 import pickle
 import shutil
 from rail_walker_gym.envs.wrappers.rollout_collect import Rollout
-import orbax.checkpoint
+import orbax.checkpoint as ocp
 
 def make_checkpoint_manager(chkpt_dir):
-    options = orbax.checkpoint.CheckpointManagerOptions(max_to_keep=10, create=True)
-    checkpointer = orbax.checkpoint.PyTreeCheckpointer()
-    checkpoint_manager = orbax.checkpoint.CheckpointManager(
-    chkpt_dir, checkpointer, options)
+    chkpt_dir = os.path.abspath(chkpt_dir)
+    item_names = ('actor', 'critic', 'target_critic', 'temp', 'dynamics_model', 'rng')
+    options = ocp.CheckpointManagerOptions(max_to_keep=10, create=True)
+    checkpoint_manager = ocp.CheckpointManager(chkpt_dir, options=options, item_names=item_names)
     return checkpoint_manager
 
 def initialize_project_log(project_dir) -> None:
@@ -55,7 +55,7 @@ def load_checkpoint_file(
     filename : str,
     agent : JaxRLAgent
 ):
-    checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+    checkpointer = ocp.PyTreeCheckpointer()
     restore_args = orbax_utils.restore_args_from_target(agent)
     agent = checkpointer.restore(filename, item=agent, restore_kwargs={'restore_args': restore_args})
     return agent
@@ -64,12 +64,14 @@ def load_latest_checkpoint(checkpoint_manager, agent : JaxRLAgent, if_failed_ret
     latest_step = checkpoint_manager.latest_step()
     if latest_step is None:
         return if_failed_return_step, agent
-    restore_args = orbax_utils.restore_args_from_target(agent)
-    agent = checkpoint_manager.restore(
-        latest_step,
-        items=agent,
-        restore_kwargs={'restore_args': restore_args}
-    )
+    #restore_args = orbax_utils.restore_args_from_target(agent)
+    restore_args = ocp.args.StandardRestore(agent)
+    #agent = checkpoint_manager.restore(
+    #    latest_step,
+    #    items=agent,
+        #restore_kwargs={'restore_args': restore_args}
+    #    restore_args
+    #)
     return latest_step, agent
 
 def load_latest_replay_buffer(project_dir) -> typing.Optional[typing.Tuple[int, ReplayBuffer]]:
@@ -111,10 +113,19 @@ def load_replay_buffer_file(filename : str) -> ReplayBuffer:
 
 def save_checkpoint(checkpoint_manager, step : int, agent : JaxRLAgent) -> None:
     try:
-        save_args = orbax_utils.save_args_from_target(agent)
-        checkpoint_manager.save(step, agent, save_kwargs={'save_args': save_args})
-    except Exception:
-        pass
+        checkpoint_manager.save(
+            step,
+            args=ocp.args.Composite(
+                actor=ocp.args.StandardSave(agent.actor),
+                critic=ocp.args.StandardSave(agent.critic),
+                target_critic=ocp.args.StandardSave(agent.target_critic),
+                temp=ocp.args.StandardSave(agent.temp),
+                dynamics_model=ocp.args.StandardSave(agent.dynamics_model),
+                rng=ocp.args.ArraySave(agent.rng),
+            )
+        )
+    except Exception as e:
+        print('Checkpoint save failed:', e)
 
 def save_replay_buffer(project_dir, step: int, replay_buffer: ReplayBuffer, delete_old_buffers : bool = True) -> None:
     buffer_dir = os.path.join(project_dir, "buffers")

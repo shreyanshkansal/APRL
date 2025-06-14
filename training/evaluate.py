@@ -23,7 +23,7 @@ import shutil
 import rail_walker_gym
 import rail_walker_interface
 
-from checkpoint_util import initialize_project_log, load_latest_checkpoint, save_rollout
+from checkpoint_util import initialize_project_log, load_latest_checkpoint, save_rollout, make_checkpoint_manager
 from eval_util import evaluate
 from task_config_util import apply_task_configs
 
@@ -126,7 +126,9 @@ def main(_):
     done = False
     # ==================== Setup Checkpointing ====================
     project_dir = os.path.join(FLAGS.save_dir, exp_name)
+    chkpt_dir = os.path.join(project_dir, 'checkpoints')
     initialize_project_log(project_dir)
+    checkpoint_manager = make_checkpoint_manager(chkpt_dir)
 
     # ==================== Setup Learning Agent and Replay Buffer ====================
     agent_kwargs = dict(FLAGS.config)
@@ -139,7 +141,7 @@ def main(_):
         **agent_kwargs
     )
 
-    agent_loaded_checkpoint_step, agent = load_latest_checkpoint(project_dir, agent, 0)
+    agent_loaded_checkpoint_step, agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
     if agent_loaded_checkpoint_step > 0:
         print(f"===================== Loaded checkpoint at step {agent_loaded_checkpoint_step} =====================")
     else:
