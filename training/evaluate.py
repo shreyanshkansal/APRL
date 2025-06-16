@@ -16,6 +16,7 @@ from ml_collections import config_flags
 import pickle
 from dm_control import viewer
 import typing
+import glob
 
 import mujoco
 from natsort import natsorted 
@@ -77,6 +78,16 @@ def import_register():
     if "Mujoco" in FLAGS.env_name:
         import rail_walker_gym.envs.register_mujoco
 
+def find_latest_exp_dir(save_dir, env_name):
+    pattern = os.path.join(save_dir, f"{env_name}*")
+    candidates = [d for d in glob.glob(pattern) if os.path.isdir(d)]
+    if not candidates:
+        raise FileNotFoundError("No matching experiment directories found.")
+    # Sort by modification time, descending, so we get latest directory
+    candidates.sort(key=os.path.getmtime, reverse=True)
+    print("candidates=", candidates)
+    return candidates[0]  # Latest directory
+
 def main(_):
     import_register()
     exp_name = FLAGS.env_name
@@ -124,13 +135,12 @@ def main(_):
     
     observation, info = eval_env.reset(return_info=True)
     done = False
-    # ==================== Setup Checkpointing ====================
-    project_dir = os.path.join(FLAGS.save_dir, exp_name)
+    # ==================== Load Latest Checkpoint Directory (according to env name) ====================
+    project_dir = find_latest_exp_dir(FLAGS.save_dir, FLAGS.env_name)
     chkpt_dir = os.path.join(project_dir, 'checkpoints')
     #no need to create new directories if they don't exist for eval
     #initialize_project_log(project_dir) 
     checkpoint_manager = make_checkpoint_manager(chkpt_dir)
-
     # ==================== Setup Learning Agent and Replay Buffer ====================
     agent_kwargs = dict(FLAGS.config)
     model_cls = agent_kwargs.pop('model_cls')
