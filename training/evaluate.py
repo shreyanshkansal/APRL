@@ -43,8 +43,9 @@ config_flags.DEFINE_config_file(
     lock_config=False)
 
 # ==================== Eval Flags ====================
-flags.DEFINE_integer('eval_episodes', 1,
+flags.DEFINE_integer('eval_episodes', 100,
                      'Number of episodes used for evaluation.')
+flags.DEFINE_float('terrain_scale', 0.5, 'Scale of generated terrain.')
 
 # ==================== Log / Save Flags ====================
 flags.DEFINE_integer('log_interval', 1, 'Logging interval.')
@@ -102,6 +103,9 @@ def main(_):
     
     # ==================== Setup Environment ====================
     eval_env : gym.Env = gym.make(FLAGS.env_name)
+    if hasattr(eval_env.unwrapped, "task") and hasattr(eval_env.unwrapped.task, "_floor"):
+        eval_env.unwrapped.task._floor.terrain_smoothness = 0.5
+        eval_env.unwrapped.task._floor.terrain_scale = FLAGS.terrain_scale
     try:
         eval_joystick_policy : rail_walker_interface.JoystickPolicy = eval_env.joystick_policy
     except:
