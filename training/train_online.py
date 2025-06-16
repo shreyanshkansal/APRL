@@ -626,8 +626,10 @@ def main(_):
     finally:
         print("======================== Cleaning up ========================")
         # ==================== Save Final Checkpoint ====================
-        if i > agent_loaded_checkpoint_step + FLAGS.start_training:
+        #if i > agent_loaded_checkpoint_step + FLAGS.start_training:
+        if i > agent_loaded_checkpoint_step:
             save_checkpoint(checkpoint_manager, i, agent)
+            checkpoint_manager.wait_until_finished()
             if FLAGS.save_buffer:
                 save_replay_buffer(project_dir, i, replay_buffer, not FLAGS.save_old_buffers)
         if FLAGS.save_training_rollouts and len(env.collected_rollouts) > 0:
