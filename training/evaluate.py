@@ -127,7 +127,8 @@ def main(_):
     # ==================== Setup Checkpointing ====================
     project_dir = os.path.join(FLAGS.save_dir, exp_name)
     chkpt_dir = os.path.join(project_dir, 'checkpoints')
-    initialize_project_log(project_dir)
+    #no need to create new directories if they don't exist for eval
+    #initialize_project_log(project_dir) 
     checkpoint_manager = make_checkpoint_manager(chkpt_dir)
 
     # ==================== Setup Learning Agent and Replay Buffer ====================
