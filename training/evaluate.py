@@ -17,6 +17,7 @@ import pickle
 from dm_control import viewer
 import typing
 import glob
+import cv2
 
 import mujoco
 from natsort import natsorted 
@@ -153,7 +154,6 @@ def main(_):
     agent_loaded_checkpoint_step, agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
     if agent_loaded_checkpoint_step > 0:
         print(f"===================== Loaded checkpoint at step {agent_loaded_checkpoint_step} =====================")
-        exit(0)
     else:
         print(f"===================== No checkpoint found! =====================")
         print("Check directory:", project_dir)
@@ -174,6 +174,9 @@ def main(_):
             
             # Step the environment
             next_observation, reward, done, info = eval_env.step(action)
+            frame = eval_env.render(mode="rgb_array") 
+            cv2.imshow("Simulation", frame)
+            cv2.waitKey(1)
             truncated = "TimeLimit.truncated" in info and info['TimeLimit.truncated']
             if (not done) or truncated:
                 mask = 1.0
