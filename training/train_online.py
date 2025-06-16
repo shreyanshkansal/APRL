@@ -246,7 +246,6 @@ def main(_):
     # ==================== Setup Learning Agent and Replay Buffer ====================
     agent_kwargs = dict(FLAGS.config)
     model_cls = agent_kwargs.pop('model_cls')
-
     agent = initialize_agent(FLAGS.seed, model_cls, env.observation_space, env.action_space, **agent_kwargs)
     agent_loaded_checkpoint_step, agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
 

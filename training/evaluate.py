@@ -101,7 +101,6 @@ def main(_):
     
     # ==================== Setup Environment ====================
     eval_env : gym.Env = gym.make(FLAGS.env_name)
-    
     try:
         eval_joystick_policy : rail_walker_interface.JoystickPolicy = eval_env.joystick_policy
     except:
@@ -119,8 +118,9 @@ def main(_):
     
     if FLAGS.launch_target_viewer:
         env = rail_walker_gym.envs.wrappers.JoystickTargetViewer(env)
-
     task_suffix, eval_env = apply_task_configs(eval_env, FLAGS.env_name, 0, FLAGS.task_config, FLAGS.reset_agent_config, True)
+    #print("obs_space:", eval_env.observation_space)
+    #exit(0)
     exp_name += task_suffix
     wandb.run.name = "Eval-" + exp_name
 
@@ -144,17 +144,16 @@ def main(_):
     # ==================== Setup Learning Agent and Replay Buffer ====================
     agent_kwargs = dict(FLAGS.config)
     model_cls = agent_kwargs.pop('model_cls')
-
     agent = globals()[model_cls].create(
         FLAGS.seed, 
         eval_env.observation_space,
         eval_env.action_space,
         **agent_kwargs
     )
-
     agent_loaded_checkpoint_step, agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
     if agent_loaded_checkpoint_step > 0:
         print(f"===================== Loaded checkpoint at step {agent_loaded_checkpoint_step} =====================")
+        exit(0)
     else:
         print(f"===================== No checkpoint found! =====================")
         print("Check directory:", project_dir)

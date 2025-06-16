@@ -15,8 +15,11 @@ def get_config():
     config.power_protect_factor = 0.6
 
     # ====================== Environment Configs ======================
-    config.frame_stack = 3
-    config.action_history = 3
+    #config.frame_stack = 3
+    #config.action_history = 3
+    #changed frame stack and action history values to match APRL
+    config.frame_stack = 0
+    config.action_history = 1
     config.limit_episode_length = 0 # 0 means no limit
 
     # ====================== Joystick Policy Configs ======================
