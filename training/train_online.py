@@ -22,6 +22,7 @@ import shutil
 import rail_walker_gym
 import rail_walker_interface
 import matplotlib.pyplot as plt
+from datetime import datetime
 
 from checkpoint_util import initialize_project_log, load_latest_checkpoint, save_checkpoint, load_latest_replay_buffer, load_latest_additional_replay_buffer, load_replay_buffer_file, save_replay_buffer, save_rollout, make_checkpoint_manager
 from eval_util import evaluate, evaluate_route_following, log_visitation, update_with_delay_with_mixed_buffers
@@ -236,7 +237,8 @@ def main(_):
     # import ipdb; ipdb.set_trace()
     done = False
     # ==================== Setup Checkpointing ====================
-    project_dir = os.path.join(FLAGS.save_dir, exp_name)
+    timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") #date format in dd/mm/yyyy
+    project_dir = os.path.join(FLAGS.save_dir, f"{exp_name}_{timestamp}")
     chkpt_dir = os.path.join(project_dir, 'checkpoints')
     initialize_project_log(project_dir)
     checkpoint_manager = make_checkpoint_manager(chkpt_dir)
