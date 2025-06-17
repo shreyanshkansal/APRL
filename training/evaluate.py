@@ -87,7 +87,6 @@ def find_latest_exp_dir(save_dir, env_name):
         raise FileNotFoundError("No matching experiment directories found.")
     # Sort by modification time, descending, so we get latest directory
     candidates.sort(key=os.path.getmtime, reverse=True)
-    print("candidates=", candidates)
     return candidates[0]  # Latest directory
 
 def main(_):
@@ -142,6 +141,7 @@ def main(_):
     done = False
     # ==================== Load Latest Checkpoint Directory (according to env name) ====================
     project_dir = find_latest_exp_dir(FLAGS.save_dir, FLAGS.env_name)
+    print(f"==================== Found latest project directory: {project_dir}================================")
     chkpt_dir = os.path.join(project_dir, 'checkpoints')
     #no need to create new directories if they don't exist for eval
     #initialize_project_log(project_dir) 
@@ -160,7 +160,7 @@ def main(_):
         print(f"===================== Loaded checkpoint at step {agent_loaded_checkpoint_step} =====================")
     else:
         print(f"===================== No checkpoint found! =====================")
-        print("Check directory:", project_dir)
+        print("Checked directory:", project_dir)
         exit(0)
     # ==================== Start Eval ====================
     accumulated_info_dict = {}
@@ -175,6 +175,7 @@ def main(_):
                 eval_env.set_wandb_step(i)
 
             action = agent.eval_actions(observation)
+            #action = agent.sample_actions(observation)
             
             # Step the environment
             next_observation, reward, done, info = eval_env.step(action)

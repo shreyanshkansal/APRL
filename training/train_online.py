@@ -239,6 +239,7 @@ def main(_):
     # ==================== Setup Checkpointing ====================
     timestamp = datetime.now().strftime("%d-%m-%Y_%H-%M-%S") #date format in dd/mm/yyyy
     project_dir = os.path.join(FLAGS.save_dir, f"{exp_name}_{timestamp}")
+    #project_dir = os.path.join(FLAGS.save_dir, exp_name)
     chkpt_dir = os.path.join(project_dir, 'checkpoints')
     initialize_project_log(project_dir)
     checkpoint_manager = make_checkpoint_manager(chkpt_dir)
@@ -250,6 +251,7 @@ def main(_):
     agent_loaded_checkpoint_step, agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
 
     if agent_loaded_checkpoint_step > 0:
+        #breakpoint()
         print(f"===================== Loaded checkpoint at step {agent_loaded_checkpoint_step} =====================")
     else:
         print(f"===================== No checkpoint found. =====================")
@@ -635,6 +637,16 @@ def main(_):
             save_rollout(project_dir, i, True, env.collected_rollouts)
         if FLAGS.save_training_videos:
             env._terminate_record()
+        print('======================== Starting eval now ==============================')
+        observation, info = eval_env.reset(return_info=True)
+        #_, eval_agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
+        for i in tqdm.trange(0, 10000, initial=0, disable=not FLAGS.tqdm, smoothing=0.1):
+            action = agent.eval_actions(observation)
+            next_observation, reward, done, info = eval_env.step(action)
+            frame = eval_env.render(mode="rgb_array") 
+            cv2.imshow("Simulation", frame)
+            cv2.waitKey(1)
+            observation = next_observation
         
         env.close()
         if eval_env is not env:

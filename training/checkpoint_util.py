@@ -8,6 +8,12 @@ import pickle
 import shutil
 from rail_walker_gym.envs.wrappers.rollout_collect import Rollout
 import orbax.checkpoint as ocp
+import torch
+import jax
+import numpy as np
+
+def to_numpy(tree):
+    return jax.tree_util.tree_map(lambda x: np.array(x), tree)
 
 def make_checkpoint_manager(chkpt_dir):
     chkpt_dir = os.path.abspath(chkpt_dir)
@@ -154,6 +160,10 @@ def save_checkpoint(checkpoint_manager, step : int, agent : JaxRLAgent) -> None:
                 rng=ocp.args.ArraySave(agent.rng),
             )
         )
+        actor_params = agent.actor.params
+        actor_params_numpy = to_numpy(actor_params)
+        torch.save(actor_params_numpy, 'actor_params.pt')
+
     except Exception as e:
         print('Checkpoint save failed:', e)
 
