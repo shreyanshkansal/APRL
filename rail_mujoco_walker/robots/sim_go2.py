@@ -21,7 +21,8 @@ class Go2SimWalker(RailSimWalkerDMControl):
             *args,
             **kwargs
         )
-        RailSimWalkerDMControl.control_timestep = 0.05
+        #RailSimWalkerDMControl.control_timestep = 0.05
+        RailSimWalkerDMControl.control_timestep = 0.10
         RailSimWalkerDMControl.control_subtimestep = 0.002
 
     #the following values are gotten from the xml file
@@ -29,10 +30,15 @@ class Go2SimWalker(RailSimWalkerDMControl):
     def joint_qpos_init(self) -> np.ndarray:
         
         return np.array([
-            0.0, 0.9, -1.8,   # FL
-            0.0, 0.9, -1.8,   # FR
-            0.0, 0.9, -1.8,   # RL
-            0.0, 0.9, -1.8    # RR
+            #0.0, 0.9, -1.8,   # FL
+            #0.0, 0.9, -1.8,   # FR
+            #0.0, 0.9, -1.8,   # RL
+            #0.0, 0.9, -1.8    # RR
+
+            0.0, 0.9, -1.7,   # FL
+            0.0, 0.9, -1.7,   # FR
+            0.0, 0.9, -1.7,   # RL
+            0.0, 0.9, -1.7    # RR
         ])
 
     @cached_property
