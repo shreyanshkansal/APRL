@@ -21,8 +21,7 @@ class Go2SimWalker(RailSimWalkerDMControl):
             *args,
             **kwargs
         )
-        #RailSimWalkerDMControl.control_timestep = 0.05
-        RailSimWalkerDMControl.control_timestep = 0.10
+        RailSimWalkerDMControl.control_timestep = 0.05
         RailSimWalkerDMControl.control_subtimestep = 0.002
 
     #the following values are gotten from the xml file
