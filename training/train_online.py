@@ -505,7 +505,7 @@ def main(_):
 
             
             if i % FLAGS.save_interval == 0 and i > agent_loaded_checkpoint_step:
-                save_checkpoint(checkpoint_manager, i, agent)
+                save_checkpoint(checkpoint_manager, i, agent, project_dir)
 
                 if i % (FLAGS.log_interval * 10) == 0 and i > agent_loaded_checkpoint_step and FLAGS.save_buffer:
                     save_replay_buffer(project_dir, i, replay_buffer, not FLAGS.save_old_buffers)
@@ -629,7 +629,7 @@ def main(_):
         # ==================== Save Final Checkpoint ====================
         #if i > agent_loaded_checkpoint_step + FLAGS.start_training:
         if i > agent_loaded_checkpoint_step:
-            save_checkpoint(checkpoint_manager, i, agent)
+            save_checkpoint(checkpoint_manager, i, agent, project_dir)
             checkpoint_manager.wait_until_finished()
             if FLAGS.save_buffer:
                 save_replay_buffer(project_dir, i, replay_buffer, not FLAGS.save_old_buffers)

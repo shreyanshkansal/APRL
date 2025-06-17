@@ -147,7 +147,7 @@ def load_replay_buffer_file(filename : str) -> ReplayBuffer:
         replay_buffer = pickle.load(f)
     return replay_buffer
 
-def save_checkpoint(checkpoint_manager, step : int, agent : JaxRLAgent) -> None:
+def save_checkpoint(checkpoint_manager, step : int, agent : JaxRLAgent, project_dir) -> None:
     try:
         checkpoint_manager.save(
             step,
@@ -160,9 +160,14 @@ def save_checkpoint(checkpoint_manager, step : int, agent : JaxRLAgent) -> None:
                 rng=ocp.args.ArraySave(agent.rng),
             )
         )
+        pytorch_actor_params_dir = os.path.join(project_dir, "pytorch_actor_params")
+        os.makedirs(pytorch_actor_params_dir, exist_ok=True)
+        filename = f"actor_params_{step}.pt"
+        save_path = os.path.join(pytorch_actor_params_dir, filename)
+
         actor_params = agent.actor.params
         actor_params_numpy = to_numpy(actor_params)
-        torch.save(actor_params_numpy, 'actor_params.pt')
+        torch.save(actor_params_numpy, save_path)
 
     except Exception as e:
         print('Checkpoint save failed:', e)
