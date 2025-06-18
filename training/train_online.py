@@ -23,6 +23,8 @@ import rail_walker_gym
 import rail_walker_interface
 import matplotlib.pyplot as plt
 from datetime import datetime
+import mujoco.viewer
+import pygame
 
 from checkpoint_util import initialize_project_log, load_latest_checkpoint, save_checkpoint, load_latest_replay_buffer, load_latest_additional_replay_buffer, load_replay_buffer_file, save_replay_buffer, save_rollout, make_checkpoint_manager
 from eval_util import evaluate, evaluate_route_following, log_visitation, update_with_delay_with_mixed_buffers
@@ -234,6 +236,12 @@ def main(_):
         env.enableWandbVideo = True
     
     observation, info = env.reset(return_info=True)
+
+    #model = env.unwrapped.model
+    #data = env.unwrapped.data
+
+    #viewer = mujoco.viewer.launch_passive(model, data)
+
     # import ipdb; ipdb.set_trace()
     done = False
     # ==================== Setup Checkpointing ====================
@@ -400,10 +408,12 @@ def main(_):
         
             # Step the environment
             next_observation, reward, done, info = env.step(action)
+            #pygame.event.pump()
+            #viewer.sync() 
             #rendering via opencv
-            frame = env.render(mode="rgb_array") 
-            cv2.imshow("Simulation", frame)
-            cv2.waitKey(1)
+            #frame = env.render(mode="rgb_array") 
+            #cv2.imshow("Simulation", frame)
+            #cv2.waitKey(1)
             truncated = "TimeLimit.truncated" in info and info['TimeLimit.truncated']
             if (not done) or truncated:
                 mask = 1.0
@@ -643,9 +653,9 @@ def main(_):
         for i in tqdm.trange(0, 10000, initial=0, disable=not FLAGS.tqdm, smoothing=0.1):
             action = agent.eval_actions(observation)
             next_observation, reward, done, info = eval_env.step(action)
-            frame = eval_env.render(mode="rgb_array") 
-            cv2.imshow("Simulation", frame)
-            cv2.waitKey(1)
+            #frame = eval_env.render(mode="rgb_array") 
+            #cv2.imshow("Simulation", frame)
+            #cv2.waitKey(1)
             observation = next_observation
         
         env.close()
