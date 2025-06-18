@@ -648,14 +648,16 @@ def main(_):
         if FLAGS.save_training_videos:
             env._terminate_record()
         print('======================== Starting eval now ==============================')
+        eval_env = rail_walker_gym.envs.wrappers.WanDBVideoWrapper(eval_env, record_every_n_steps=5000, video_length_limit=FLAGS.training_video_length_limit) # wrap environment to automatically save video to wandb
+        eval_env.enableWandbVideo = True
         observation, info = eval_env.reset(return_info=True)
         #_, eval_agent = load_latest_checkpoint(checkpoint_manager, agent, 0)
-        for i in tqdm.trange(0, 10000, initial=0, disable=not FLAGS.tqdm, smoothing=0.1):
+        for i in tqdm.trange(0, 20000, initial=0, disable=not FLAGS.tqdm, smoothing=0.1):
             action = agent.eval_actions(observation)
             next_observation, reward, done, info = eval_env.step(action)
-            #frame = eval_env.render(mode="rgb_array") 
-            #cv2.imshow("Simulation", frame)
-            #cv2.waitKey(1)
+            frame = eval_env.render(mode="rgb_array") 
+            cv2.imshow("Simulation", frame)
+            cv2.waitKey(1)
             observation = next_observation
         
         env.close()
