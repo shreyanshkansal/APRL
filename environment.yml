@@ -78,6 +78,7 @@ dependencies:
       - commonmark==0.9.1
       - contourpy==1.3.2
       - cycler==0.12.1
+      - cython==3.1.2
       - decorator==4.4.2
       - dm-control==1.0.11
       - dm-env==1.6
@@ -87,6 +88,7 @@ dependencies:
       - exceptiongroup==1.3.0
       - executing==2.2.0
       - farama-notifications==0.0.4
+      - filelock==3.13.1
       - filterpy==1.4.5
       - flatbuffers==25.2.10
       - flax==0.10.6
@@ -132,6 +134,7 @@ dependencies:
       - ml-collections==1.1.0
       - ml-dtypes==0.5.1
       - moviepy==1.0.3
+      - mpmath==1.3.0
       - msgpack==1.1.0
       - mujoco==2.3.3
       - mujoco-utils==0.0.5
@@ -178,12 +181,13 @@ dependencies:
       - pytz==2025.2
       - pywavelets==1.8.0
       - pyyaml==6.0.2
+      - pyzed==4.2
       - requests==2.32.3
       - requests-oauthlib==2.0.0
       - rich==11.2.0
       - rsa==4.9.1
       - scikit-image==0.20.0
-      - scipy==1.12.0
+      - scipy==1.14.1
       - sentry-sdk==2.29.1
       - setproctitle==1.3.6
       - shimmy==1.3.0
@@ -191,6 +195,7 @@ dependencies:
       - six==1.17.0
       - smmap==5.0.2
       - stack-data==0.6.3
+      - sympy==1.13.1
       - tensorboard==2.11.2
       - tensorboard-data-server==0.6.1
       - tensorboard-plugin-wit==1.8.1
@@ -203,12 +208,14 @@ dependencies:
       - tifffile==2025.5.10
       - tomli==2.2.1
       - toolz==1.0.0
+      - torch==2.6.0+cpu
       - tqdm==4.64.1
       - traitlets==5.14.3
       - transforms3d==0.4.2
       - treescope==0.1.9
       - typing-inspect==0.9.0
       - tzdata==2025.2
+      - urdf2mjcf==0.1.3
       - urllib3==2.4.0
       - wandb==0.14.2
       - wcwidth==0.2.13
