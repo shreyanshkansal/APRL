@@ -165,6 +165,8 @@ def main(_):
 
     if "Bumpy" in FLAGS.env_name:
         exp_name += f"_ts{FLAGS.terrain_scale}"
+    
+    exp_name += f'_targetvel{FLAGS.task_config.rew_target_velocity}'
     # ==================== Setup WandB ====================
     wandb.init(project=FLAGS.project_name, dir=os.getenv('WANDB_LOGDIR'))
     wandb.run.name = exp_name
