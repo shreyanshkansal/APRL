@@ -1,11 +1,12 @@
 import functools
 from typing import Optional, Type
 
-import tensorflow_probability
+#import tensorflow_probability
+import tensorflow_probability.substrates.jax as tfp
 
 from jaxrl5.distributions.tanh_transformed import TanhTransformedDistribution
 
-tfp = tensorflow_probability.substrates.jax
+#tfp = tensorflow_probability.substrates.jax
 tfd = tfp.distributions
 
 import flax.linen as nn
